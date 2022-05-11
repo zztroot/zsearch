@@ -59,12 +59,15 @@ func NewSearch(opts *options.CmdOptions) *search {
 }
 
 func (s *search) Search() error {
+	defer func() {
+		fmt.Println("\n" + fmt.Sprintf(Tail, s.TD.StartTime, s.TD.EndTime, s.TD.FileNum, s.TD.DirNum, fmt.Sprintf("%dms", s.TD.Second)))
+	}()
 	start := time.Now()
 	s.TD.StartTime = start.Format(FormatTime)
-	defer func(t time.Time) {
+	defer func() {
 		s.TD.EndTime = time.Now().Format(FormatTime)
-		s.TD.Second = time.Since(t).Milliseconds()
-	}(start)
+		s.TD.Second = time.Since(start).Milliseconds()
+	}()
 	// 获取目录下所有文件
 	if s.Path == "" {
 		s.Path, _ = os.Getwd()
@@ -91,7 +94,6 @@ func (s *search) Search() error {
 	}
 	// 搜索
 	s.run()
-	fmt.Println(fmt.Sprintf(Tail, s.TD.StartTime, s.TD.EndTime, s.TD.FileNum, s.TD.DirNum, fmt.Sprintf("%dms", s.TD.Second)))
 	return nil
 }
 
@@ -148,6 +150,7 @@ func (s *search) fileContent(c chan struct{}, p string) {
 	}
 	read, err := ioutil.ReadFile(p)
 	if err != nil {
+		fmt.Println(fmt.Sprintf(ResultsFileContent+" %v", p, 0, err))
 		return
 	}
 	num := strings.Count(string(read), s.Value)
