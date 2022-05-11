@@ -1,4 +1,4 @@
-package zsearch
+package search
 
 import (
 	"fmt"

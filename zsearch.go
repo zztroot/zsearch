@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"zsearch/options"
-	"zsearch/zsearch"
+	"zsearch/search"
 
 	"github.com/jessevdk/go-flags"
 )
@@ -15,8 +15,8 @@ import (
 func main() {
 	opts := new(options.CmdOptions)
 	parser := flags.NewParser(opts, flags.Default)
-	parser.Name = zsearch.Name
-	parser.Usage = zsearch.Usage
+	parser.Name = search.Name
+	parser.Usage = search.Usage
 	parser.LongDescription = "author:zzt"
 	_, err := parser.Parse()
 	if err != nil {
@@ -35,22 +35,22 @@ func main() {
 	}
 	// 是否显示版本
 	if opts.Version {
-		fmt.Println(zsearch.Version)
+		fmt.Println(search.Version)
 		return
 	}
 	if opts.About {
-		fmt.Println(zsearch.About)
+		fmt.Println(search.About)
 		return
 	}
 	if opts.Ext {
 		r := bytes.Buffer{}
-		for ext := range zsearch.ExtMap {
-			_, _ = r.WriteString(ext + zsearch.ExtSplit)
+		for ext := range search.ExtMap {
+			_, _ = r.WriteString(ext + search.ExtSplit)
 		}
 		fmt.Println(r.String())
 		return
 	}
-	search := zsearch.NewSearch(opts)
+	search := search.NewSearch(opts)
 	if err := search.Search(); err != nil {
 		fmt.Println(err)
 	}

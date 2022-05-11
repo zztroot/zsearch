@@ -1,4 +1,4 @@
-package zsearch
+package search
 
 var ExtMap = map[string]struct{}{
 	".txt":   {},
