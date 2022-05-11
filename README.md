@@ -16,6 +16,7 @@ $ zsearch -d error
 StartTime:2022-05-11 10:30:13 | EndTime:2022-05-11 10:30:13 | FileNum:13 | DirNum:4 | Second:0ms
 ```
 -d：specify search content  
+->3：number of matches  
 [f] search by file name [type]  
 [c] search by file content [type]  
 *more usage -h
@@ -37,6 +38,7 @@ $ zsearch -c -d error
 StartTime:2022-05-11 10:38:41 | EndTime:2022-05-11 10:38:41 | FileNum:13 | DirNum:4 | Second:0ms
 ```
 -c：search by file content  
+->3：number of matches  
 *more usage -h
 ##### -d parameter is a required item, and other parameters are optional. The default is to search the file name and file content of the current directory
 ##### -p you can specify a search directory
