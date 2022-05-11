@@ -50,8 +50,8 @@ func main() {
 		fmt.Println(r.String())
 		return
 	}
-	search := search.NewSearch(opts)
-	if err := search.Search(); err != nil {
+	s := search.NewSearch(opts)
+	if err := s.Search(); err != nil {
 		fmt.Println(err)
 	}
 }
