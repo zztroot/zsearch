@@ -25,15 +25,6 @@ type search struct {
 	TD       TailData
 }
 
-type fileMap struct {
-	Name  string
-	Path  string
-	Size  int64
-	IsDir bool
-}
-
-var fm []fileMap
-
 type TailData struct {
 	StartTime string
 	EndTime   string
@@ -63,6 +54,8 @@ func (s *search) Search() error {
 	defer func() {
 		fmt.Println("\n" + fmt.Sprintf(Tail, s.TD.StartTime, s.TD.EndTime, s.TD.FileNum, s.TD.DirNum, fmt.Sprintf("%dms", s.TD.Second), s.TD.FoundNum))
 	}()
+	cupNum := runtime.NumCPU()
+	c := make(chan struct{}, cupNum)
 	start := time.Now()
 	s.TD.StartTime = start.Format(FormatTime)
 	defer func() {
@@ -80,12 +73,25 @@ func (s *search) Search() error {
 	if err := filepath.Walk(filepath.FromSlash(s.Path), func(path string, info fs.FileInfo, err error) error {
 		if !info.IsDir() {
 			s.TD.FileNum++
-			fm = append(fm, fileMap{
-				Path:  path,
-				Name:  info.Name(),
-				Size:  info.Size(),
-				IsDir: info.IsDir(),
-			})
+			if s.ALL {
+				// 查询全部
+				s.Wait.Add(1)
+				c <- struct{}{}
+				go s.fileName(c, path, info.Name())
+				s.Wait.Add(1)
+				c <- struct{}{}
+				go s.fileContent(c, path)
+			} else if s.FileName {
+				// 查询文件名
+				s.Wait.Add(1)
+				c <- struct{}{}
+				go s.fileName(c, path, info.Name())
+			} else {
+				// 查询文件内容
+				s.Wait.Add(1)
+				c <- struct{}{}
+				go s.fileContent(c, path)
+			}
 		} else {
 			s.TD.DirNum++
 		}
@@ -93,48 +99,17 @@ func (s *search) Search() error {
 	}); err != nil {
 		return Fail(ErrorDirectory)
 	}
-	// 搜索
-	s.run()
+	s.Wait.Wait()
 	return nil
 }
 
-func (s *search) run() {
-	cupNum := runtime.NumCPU()
-	c := make(chan struct{}, cupNum)
-	if s.ALL {
-		// 查询全部
-		for i := range fm {
-			s.Wait.Add(2)
-			c <- struct{}{}
-			go s.fileName(c, fm[i].Path, &fm[i])
-			c <- struct{}{}
-			go s.fileContent(c, fm[i].Path)
-		}
-	} else if s.FileName {
-		// 查询文件名
-		for i := range fm {
-			s.Wait.Add(1)
-			c <- struct{}{}
-			go s.fileName(c, fm[i].Path, &fm[i])
-		}
-	} else {
-		// 查询文件内容
-		for i := range fm {
-			s.Wait.Add(1)
-			c <- struct{}{}
-			go s.fileContent(c, fm[i].Path)
-		}
-	}
-	s.Wait.Wait()
-}
-
 // 搜索文件名
-func (s *search) fileName(c chan struct{}, path string, info *fileMap) {
+func (s *search) fileName(c chan struct{}, path, name string) {
 	defer func() {
 		<-c
 		s.Wait.Done()
 	}()
-	if strings.Contains(info.Name, s.Value) {
+	if strings.Contains(name, s.Value) {
 		s.TD.FoundNum++
 		fmt.Println(fmt.Sprintf(ResultsFileName, path))
 	}
