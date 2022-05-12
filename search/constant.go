@@ -2,7 +2,7 @@ package search
 
 const (
 	Name    = "ZSEARCH"
-	Version = "v0.0.1"
+	Version = "v0.0.2"
 	Usage   = "[OPTIONS VALUE]||[OPTIONS=VALUE]"
 	About   = "Name:zhongtian zhao | Email:1033141032@qq.com"
 )
