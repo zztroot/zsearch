@@ -42,3 +42,8 @@ StartTime:2022-05-11 10:38:41 | EndTime:2022-05-11 10:38:41 | FileNum:13 | DirNu
 *more usage -h
 ##### -d parameter is a required item, and other parameters are optional. The default is to search the file name and file content of the current directory
 ##### -p you can specify a search directory
+### Output search results to current file
+```cmd
+$ ./zsearch -d 123 -> log.txt
+```
+This allows you to use the VIM function for viewing or precise positioning
