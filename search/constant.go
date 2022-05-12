@@ -14,7 +14,7 @@ const (
 
 // 格式化输出
 const (
-	Tail = `StartTime:%s | EndTime:%s | FileNum:%d | DirNum:%d | Second:%s`
+	Tail = `StartTime:%s | EndTime:%s | FileNum:%d | DirNum:%d | Second:%s | FoundNum:%d`
 	// 文件路径
 	ResultsFileName = `[f] %s`
 	// 文件路径 -> 文件内容匹配到多少数量

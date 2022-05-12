@@ -40,6 +40,7 @@ type TailData struct {
 	FileNum   int32
 	DirNum    int32
 	Second    int64
+	FoundNum  int32
 }
 
 func NewSearch(opts *options.CmdOptions) *search {
@@ -60,7 +61,7 @@ func NewSearch(opts *options.CmdOptions) *search {
 
 func (s *search) Search() error {
 	defer func() {
-		fmt.Println("\n" + fmt.Sprintf(Tail, s.TD.StartTime, s.TD.EndTime, s.TD.FileNum, s.TD.DirNum, fmt.Sprintf("%dms", s.TD.Second)))
+		fmt.Println("\n" + fmt.Sprintf(Tail, s.TD.StartTime, s.TD.EndTime, s.TD.FileNum, s.TD.DirNum, fmt.Sprintf("%dms", s.TD.Second), s.TD.FoundNum))
 	}()
 	start := time.Now()
 	s.TD.StartTime = start.Format(FormatTime)
@@ -134,6 +135,7 @@ func (s *search) fileName(c chan struct{}, path string, info *fileMap) {
 		s.Wait.Done()
 	}()
 	if strings.Contains(info.Name, s.Value) {
+		s.TD.FoundNum++
 		fmt.Println(fmt.Sprintf(ResultsFileName, path))
 	}
 }
@@ -150,11 +152,13 @@ func (s *search) fileContent(c chan struct{}, p string) {
 	}
 	read, err := ioutil.ReadFile(p)
 	if err != nil {
+		s.TD.FoundNum++
 		fmt.Println(fmt.Sprintf(ResultsFileContent+" %v", p, 0, err))
 		return
 	}
 	num := strings.Count(string(read), s.Value)
 	if num > 0 {
+		s.TD.FoundNum++
 		fmt.Println(fmt.Sprintf(ResultsFileContent, p, num))
 	}
 }
