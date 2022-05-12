@@ -71,6 +71,9 @@ func (s *search) Search() error {
 		return err
 	}
 	if err := filepath.Walk(filepath.FromSlash(s.Path), func(path string, info fs.FileInfo, err error) error {
+		if info == nil {
+			return nil
+		}
 		if !info.IsDir() {
 			s.TD.FileNum++
 			if s.ALL {
