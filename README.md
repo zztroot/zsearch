@@ -1,8 +1,8 @@
 # zsearch
-Search for file names or matching file contents according to the specified directory
+Search for file names or matching file contents according to the specified directory.
 
 # download
-After downloading, configure the system environment variables and you can use them directly  
+After downloading, configure the system environment variables and you can use them directly.  
 The download address is: https://github.com/zztroot/zsearch/releases
 
 # example
