@@ -11,6 +11,7 @@ import (
 	"strings"
 	"sync"
 	"time"
+	"unicode"
 
 	"zsearch/options"
 )
@@ -21,6 +22,7 @@ type search struct {
 	Content  bool   // 搜索文件内容
 	Path     string // 搜索路径
 	ALL      bool   // 搜索全部，包括文件名和文件内容
+	NoAa     bool   // 搜索是否区分大小写
 	Wait     sync.WaitGroup
 	TD       TailData
 }
@@ -47,6 +49,10 @@ func NewSearch(opts *options.CmdOptions) *search {
 		search.FileName = opts.File
 	}
 	search.Value = opts.Value
+	if opts.NoAa {
+		search.NoAa = opts.NoAa
+		search.Value = strings.Map(unicode.ToLower, opts.Value)
+	}
 	return search
 }
 
@@ -112,6 +118,9 @@ func (s *search) fileName(c chan struct{}, path, name string) {
 		<-c
 		s.Wait.Done()
 	}()
+	if s.NoAa {
+		name = strings.Map(unicode.ToLower, name)
+	}
 	if strings.Contains(name, s.Value) {
 		s.TD.FoundNum++
 		fmt.Println(fmt.Sprintf(ResultsFileName, path))
@@ -134,7 +143,11 @@ func (s *search) fileContent(c chan struct{}, p string) {
 		fmt.Println(fmt.Sprintf(ResultsFileContent+" %v", p, 0, err))
 		return
 	}
-	num := strings.Count(string(read), s.Value)
+	text := string(read)
+	if s.NoAa {
+		text = strings.Map(unicode.ToLower, text)
+	}
+	num := strings.Count(text, s.Value)
 	if num > 0 {
 		s.TD.FoundNum++
 		fmt.Println(fmt.Sprintf(ResultsFileContent, p, num))
