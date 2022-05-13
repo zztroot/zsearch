@@ -115,6 +115,10 @@ func (s *search) Search() error {
 // 搜索文件名
 func (s *search) fileName(c chan struct{}, path, name string) {
 	defer func() {
+		// 不用处理recover错误
+		recover()
+	}()
+	defer func() {
 		<-c
 		s.Wait.Done()
 	}()
@@ -129,6 +133,10 @@ func (s *search) fileName(c chan struct{}, path, name string) {
 
 // 搜索文件内容
 func (s *search) fileContent(c chan struct{}, p string) {
+	defer func() {
+		// 不用处理recover错误
+		recover()
+	}()
 	defer func() {
 		<-c
 		s.Wait.Done()
