@@ -60,8 +60,8 @@ func (s *search) Search() error {
 	defer func() {
 		fmt.Println("\n" + fmt.Sprintf(Tail, s.TD.StartTime, s.TD.EndTime, s.TD.FileNum, s.TD.DirNum, fmt.Sprintf("%dms", s.TD.Second), s.TD.FoundNum))
 	}()
-	cupNum := runtime.NumCPU()
-	c := make(chan struct{}, cupNum)
+	cpuNum := runtime.NumCPU()
+	c := make(chan struct{}, cpuNum)
 	start := time.Now()
 	s.TD.StartTime = start.Format(FormatTime)
 	defer func() {
@@ -153,7 +153,7 @@ func (s *search) fileContent(c chan struct{}, p string) {
 	}
 	text := string(read)
 	if s.NoAa {
-		text = strings.Map(unicode.ToLower, text)
+		text = strings.ToLower(text)
 	}
 	num := strings.Count(text, s.Value)
 	if num > 0 {
